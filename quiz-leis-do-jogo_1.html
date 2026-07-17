@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teste às Leis do Jogo 2025/26</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@600;700;800&display=swap');
+
+  :root{
+    --pitch-dark: #0d3b2e;
+    --pitch-mid: #14503e;
+    --pitch-line: #eef3ea;
+    --chalk: #f4f6f1;
+    --chalk-dim: #cdd9cd;
+    --yellow: #f3c331;
+    --yellow-deep: #d9a916;
+    --red: #d8302a;
+    --red-deep: #a8221d;
+    --ink: #0a2820;
+    --radius: 14px;
+    --shadow: 0 18px 40px -18px rgba(0,0,0,0.55);
+  }
+
+  *{ box-sizing: border-box; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    font-family: 'Barlow', system-ui, sans-serif;
+    color: var(--chalk);
+    background:
+      radial-gradient(1200px 700px at 15% -10%, rgba(255,255,255,0.05), transparent 60%),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.035) 0 2px, transparent 2px 120px),
+      linear-gradient(180deg, var(--pitch-dark), #0a2c22 60%, #082921);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding: 28px 16px 60px;
+  }
+
+  .app{ width:100%; max-width: 640px; }
+
+  header.top{
+    display:flex; align-items:center; gap:12px;
+    margin-bottom: 22px;
+  }
+  .whistle{
+    width:40px; height:40px; flex:none;
+  }
+  header.top h1{
+    font-family:'Barlow Semi Condensed', sans-serif;
+    font-weight:800;
+    letter-spacing:0.5px;
+    font-size: 20px;
+    margin:0;
+    text-transform: uppercase;
+    color: var(--chalk);
+  }
+  header.top p{
+    margin:2px 0 0;
+    font-size: 12.5px;
+    color: var(--chalk-dim);
+  }
+
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015));
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 26px;
+  }
+
+  /* ---------- START SCREEN ---------- */
+  .start .badge{
+    display:inline-flex; align-items:center; gap:8px;
+    background: rgba(243,195,49,0.12);
+    border:1px solid rgba(243,195,49,0.35);
+    color: var(--yellow);
+    font-size: 12px; font-weight:700; letter-spacing:0.4px;
+    padding: 6px 12px; border-radius: 999px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .start h2{
+    font-family:'Anton', sans-serif;
+    font-weight:400;
+    font-size: clamp(28px, 6vw, 38px);
+    line-height:1.05;
+    margin: 0 0 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .start p.lead{
+    color: var(--chalk-dim);
+    font-size: 15px;
+    line-height:1.55;
+    margin: 0 0 22px;
+  }
+  .stat-row{
+    display:grid; grid-template-columns: repeat(3,1fr);
+    gap:10px; margin-bottom: 26px;
+  }
+  .stat{
+    text-align:center;
+    background: rgba(0,0,0,0.18);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 14px 8px;
+  }
+  .stat b{
+    display:block; font-family:'Anton', sans-serif; font-weight:400;
+    font-size: 26px; color: var(--yellow);
+  }
+  .stat span{ font-size: 11px; color: var(--chalk-dim); text-transform:uppercase; letter-spacing:0.4px; }
+
+  button.primary{
+    width:100%;
+    border:none;
+    cursor:pointer;
+    background: linear-gradient(180deg, var(--yellow), var(--yellow-deep));
+    color: var(--ink);
+    font-family:'Barlow Semi Condensed', sans-serif;
+    font-weight:800;
+    font-size: 17px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    padding: 15px 18px;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px -8px rgba(243,195,49,0.55);
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  button.primary:hover{ transform: translateY(-1px); box-shadow: 0 14px 26px -8px rgba(243,195,49,0.65); }
+  button.primary:active{ transform: translateY(0); }
+  button.primary:focus-visible, .opt:focus-visible, button.ghost:focus-visible{
+    outline: 3px solid #ffffff; outline-offset: 2px;
+  }
+
+  button.ghost{
+    width:100%;
+    margin-top:10px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.25);
+    color: var(--chalk);
+    font-family:'Barlow Semi Condensed', sans-serif;
+    font-weight:700;
+    font-size: 14px;
+    text-transform:uppercase;
+    letter-spacing:0.3px;
+    padding: 11px 16px;
+    border-radius: 10px;
+    cursor:pointer;
+  }
+  button.ghost:hover{ background: rgba(255,255,255,0.06); }
+
+  /* ---------- QUIZ SCREEN ---------- */
+  .quiz-top{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom: 14px; gap: 10px;
+  }
+  .progress-wrap{ flex:1; }
+  .progress-label{
+    font-size: 12px; color: var(--chalk-dim); margin-bottom:6px;
+    display:flex; justify-content:space-between;
+  }
+  .progress-bar{
+    height:8px; border-radius:999px; background: rgba(255,255,255,0.1);
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%; background: linear-gradient(90deg, var(--yellow-deep), var(--yellow));
+    border-radius:999px; transition: width .3s ease;
+  }
+  .score-pills{ display:flex; gap:8px; flex:none; }
+  .pill{
+    display:flex; align-items:center; gap:5px;
+    font-family:'Barlow Semi Condensed', sans-serif; font-weight:700; font-size: 13px;
+    padding: 6px 10px; border-radius: 999px;
+    border:1px solid rgba(255,255,255,0.12);
+  }
+  .pill.ok{ background: rgba(60,170,110,0.16); color:#7fe0ac; }
+  .pill.bad{ background: rgba(216,48,42,0.16); color:#ff9d97; }
+
+  .law-tag{
+    display:inline-block;
+    font-size: 11px; font-weight:700; letter-spacing:0.5px;
+    text-transform: uppercase;
+    color: var(--pitch-dark);
+    background: var(--chalk);
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+  }
+
+  .question-text{
+    font-family:'Barlow Semi Condensed', sans-serif;
+    font-weight:700;
+    font-size: 20px;
+    line-height:1.3;
+    margin: 0 0 20px;
+  }
+
+  .options{ display:flex; flex-direction:column; gap:10px; }
+  .opt{
+    text-align:left;
+    display:flex; align-items:center; gap:12px;
+    background: rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.14);
+    color: var(--chalk);
+    font-family:'Barlow', sans-serif;
+    font-size: 15px;
+    font-weight:500;
+    padding: 13px 14px;
+    border-radius: 10px;
+    cursor:pointer;
+    transition: background .12s ease, border-color .12s ease, transform .1s ease;
+  }
+  .opt:hover:not(:disabled){ background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.28); }
+  .opt:disabled{ cursor:default; }
+  .opt .marker{
+    flex:none; width:24px; height:24px; border-radius:50%;
+    border:1.5px solid rgba(255,255,255,0.35);
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:800; color: var(--chalk-dim);
+  }
+  .opt.correct{
+    background: rgba(60,170,110,0.16);
+    border-color: #59c98a;
+  }
+  .opt.correct .marker{ background:#59c98a; border-color:#59c98a; color:#06251a; }
+  .opt.wrong{
+    background: rgba(216,48,42,0.16);
+    border-color: #e5615c;
+  }
+  .opt.wrong .marker{ background:#e5615c; border-color:#e5615c; color:#2a0806; }
+  .opt.dim{ opacity:0.55; }
+
+  .feedback{
+    margin-top: 18px;
+    border-radius: 10px;
+    padding: 16px 16px 16px 16px;
+    border-left: 4px solid var(--yellow);
+    background: rgba(0,0,0,0.22);
+    animation: rise .25s ease;
+  }
+  @keyframes rise{ from{ opacity:0; transform: translateY(6px);} to{opacity:1; transform:translateY(0);} }
+  .feedback.correct{ border-left-color:#59c98a; }
+  .feedback.wrong{ border-left-color:#e5615c; }
+  .feedback .fb-title{
+    font-family:'Barlow Semi Condensed', sans-serif;
+    font-weight:800; text-transform:uppercase; font-size: 13px; letter-spacing:0.4px;
+    margin-bottom:6px; display:flex; align-items:center; gap:8px;
+  }
+  .feedback.correct .fb-title{ color:#7fe0ac; }
+  .feedback.wrong .fb-title{ color:#ff9d97; }
+  .feedback p{ margin:0; font-size: 14px; line-height:1.55; color: var(--chalk-dim); }
+  .feedback .cite{ color: var(--chalk); font-style: italic; }
+
+  .next-wrap{ margin-top: 18px; }
+
+  /* ---------- END SCREEN ---------- */
+  .end .score-hero{
+    text-align:center;
+    padding: 20px 0 8px;
+  }
+  .score-hero .big{
+    font-family:'Anton', sans-serif; font-weight:400;
+    font-size: 64px; line-height:1;
+    color: var(--yellow);
+  }
+  .score-hero .of{ font-size: 22px; color: var(--chalk-dim); }
+  .score-hero .pct{ margin-top:8px; font-size: 14px; color: var(--chalk-dim); text-transform:uppercase; letter-spacing:0.5px;}
+  .end-msg{
+    text-align:center; font-size: 15px; color: var(--chalk); margin: 14px 0 22px;
+    font-family:'Barlow Semi Condensed', sans-serif; font-weight:600;
+  }
+
+  .review{
+    margin-top: 4px;
+  }
+  .review-toggle{
+    width:100%;
+    background: transparent;
+    border: none;
+    color: var(--chalk-dim);
+    font-size: 13px;
+    text-decoration: underline;
+    cursor:pointer;
+    padding: 8px 0 4px;
+  }
+  .review-list{ display:none; margin-top: 14px; display:flex; flex-direction:column; gap:10px; }
+  .review-list.open{ display:flex; }
+  .review-item{
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.03);
+  }
+  .review-item .ri-q{ font-size: 13.5px; font-weight:600; margin-bottom:6px; }
+  .review-item .ri-tag{
+    display:inline-block; font-size:10.5px; font-weight:700; margin-bottom: 4px;
+    padding: 2px 8px; border-radius:999px;
+  }
+  .review-item.ok .ri-tag{ background: rgba(60,170,110,0.18); color:#7fe0ac; }
+  .review-item.bad .ri-tag{ background: rgba(216,48,42,0.18); color:#ff9d97; }
+  .review-item .ri-ans{ font-size: 12.5px; color: var(--chalk-dim); }
+
+  footer.note{
+    text-align:center; margin-top: 20px; font-size: 11.5px; color: rgba(255,255,255,0.35);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="top">
+    <svg class="whistle" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="24" cy="24" r="23" fill="#f3c331" opacity="0.12"/>
+      <path d="M10 22c0-4 3-7 7-7h10l6-4v6h2a5 5 0 015 5 5 5 0 01-5 5h-1a9 9 0 01-9 8h-8a7 7 0 01-7-7v-6z" stroke="#f3c331" stroke-width="2" fill="none" stroke-linejoin="round"/>
+      <circle cx="17" cy="25" r="2.4" fill="#f3c331"/>
+    </svg>
+    <div>
+      <h1>Teste às Leis do Jogo</h1>
+      <p>IFAB · Edição 2025/26 · 20 perguntas por teste</p>
+    </div>
+  </header>
+
+  <div id="screen-start" class="card start">
+    <span class="badge">✓ Base de dados carregada</span>
+    <h2>És apanhado na armadilha?</h2>
+    <p class="lead">70 perguntas de escolha múltipla sobre as Leis do Jogo 2025/26, com respostas propositadamente enganadoras. Cada teste sorteia 20 perguntas ao acaso. Depois de responderes, mostramos sempre a lei que justifica a resposta certa — quer acertes, quer erres.</p>
+    <div class="stat-row">
+      <div class="stat"><b>70</b><span>Perguntas</span></div>
+      <div class="stat"><b>20</b><span>Por teste</span></div>
+      <div class="stat"><b>17</b><span>Leis cobertas</span></div>
+    </div>
+    <button class="primary" id="btn-start">Começar teste</button>
+  </div>
+
+  <div id="screen-quiz" class="card" style="display:none;">
+    <div class="quiz-top">
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span id="q-counter">Pergunta 1/20</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:5%"></div></div>
+      </div>
+      <div class="score-pills">
+        <span class="pill ok">✅ <span id="score-ok">0</span></span>
+        <span class="pill bad">🟥 <span id="score-bad">0</span></span>
+      </div>
+    </div>
+
+    <span class="law-tag" id="law-tag">Lei 1</span>
+    <p class="question-text" id="question-text">—</p>
+    <div class="options" id="options"></div>
+
+    <div id="feedback-wrap"></div>
+    <div class="next-wrap" id="next-wrap" style="display:none;">
+      <button class="primary" id="btn-next">Seguinte pergunta</button>
+    </div>
+  </div>
+
+  <div id="screen-end" class="card end" style="display:none;">
+    <div class="score-hero">
+      <span class="big" id="end-score">0</span><span class="of"> / 20</span>
+      <div class="pct" id="end-pct">0% de acerto</div>
+    </div>
+    <p class="end-msg" id="end-msg">—</p>
+    <button class="primary" id="btn-restart">Fazer novo teste</button>
+    <div class="review">
+      <button class="review-toggle" id="review-toggle">Ver revisão pergunta a pergunta ▾</button>
+      <div class="review-list" id="review-list"></div>
+    </div>
+  </div>
+
+  <footer class="note">Baseado em "Regras do Jogo 2025/26", IFAB — entrada em vigor a 1 de julho de 2025.</footer>
+</div>
+
+<script>
+/* ---------------------------------------------------------
+   BASE DE PERGUNTAS
+   options[0] é sempre a resposta certa; será baralhada em runtime.
+--------------------------------------------------------- */
+const QUESTION_BANK = [
+{law:"Lei 1 · Campo de jogo", q:"A que distância da linha de fundo é colocada a marca de grande penalidade?", options:["11 m","9 m","12 m","10,5 m"], note:"A marca penal fica a 11 m do ponto médio entre as traves."},
+{law:"Lei 1 · Campo de jogo", q:"Qual é o raio do arco traçado no exterior da área penal, a partir da marca de grande penalidade?", options:["9,15 m","7,32 m","5,5 m","11 m"], note:"O arco penal tem um raio de 9,15 m a partir do centro da marca penal."},
+{law:"Lei 1 · Campo de jogo", q:"A que distância da baliza se traçam as linhas da área de baliza (pequena área)?", options:["5,5 m","6 m","9,15 m","16,5 m"], note:"A área de baliza é traçada a 5,5 m do interior de cada trave."},
+{law:"Lei 1 · Campo de jogo", q:"A que distância da baliza se traçam as linhas da área penal (grande área)?", options:["16,5 m","18 m","15 m","20 m"], note:"A área penal é traçada a 16,5 m do interior de cada trave."},
+{law:"Lei 1 · Campo de jogo", q:"Qual é o raio do círculo central?", options:["9,15 m","10 m","7,32 m","11 m"], note:"O círculo central tem 9,15 m de raio, a mesma medida usada nos livres e cantos."},
+{law:"Lei 1 · Campo de jogo", q:"Qual a altura mínima exigida a um poste de bandeira de canto?", options:["1,5 m","1 m","1,2 m","2 m"], note:"O poste de bandeira do canto deve ter, no mínimo, 1,5 m de altura, sem ponta afiada."},
+{law:"Lei 1 · Campo de jogo", q:"Qual é a distância entre as faces interiores dos postes da baliza?", options:["7,32 m","7,50 m","6,96 m","8 m"], note:"A distância entre a parte interior das traves é de 7,32 m."},
+{law:"Lei 1 · Campo de jogo", q:"Qual é a altura da baliza, do chão ao travessão?", options:["2,44 m","2,40 m","2,50 m","2,20 m"], note:"A distância do travessão ao chão é de 2,44 m."},
+{law:"Lei 1 · Campo de jogo", q:"Qual é a largura máxima permitida para as linhas que marcam o campo?", options:["12 cm","10 cm","15 cm","8 cm"], note:"Todas as linhas devem ter a mesma largura, no máximo 12 cm."},
+{law:"Lei 1 · Campo de jogo", q:"Num jogo não internacional, quais os comprimentos mínimo e máximo da linha lateral?", options:["90–120 m","100–110 m","45–90 m","64–75 m"], note:"A linha lateral pode medir entre 90 m e 120 m."},
+{law:"Lei 1 · Campo de jogo", q:"Num jogo não internacional, quais os comprimentos mínimo e máximo da linha de fundo?", options:["45–90 m","90–120 m","64–75 m","50–100 m"], note:"A linha de fundo pode medir entre 45 m e 90 m."},
+{law:"Lei 1 · Campo de jogo", q:"Em jogos internacionais, quais os limites para a linha lateral?", options:["100–110 m","90–120 m","64–75 m","105 m fixos"], note:"Em jogos internacionais, a linha lateral deve medir entre 100 m e 110 m."},
+{law:"Lei 1 · Campo de jogo", q:"Qual é o raio da área do canto (quarto de círculo junto ao poste de bandeira)?", options:["1 m","1,5 m","0,5 m","2 m"], note:"A área do canto é delimitada por um quarto de círculo com 1 m de raio."},
+{law:"Lei 1 · Campo de jogo", q:"Se o travessão se partir durante o jogo e não puder ser reparado, o que acontece?", options:["O jogo deve ser suspenso","Marca-se golo automático","Substitui-se por uma corda","O jogo continua sem travessão"], note:"Se não for possível reparar o travessão, o jogo deverá ser suspenso; nunca pode ser substituído por corda ou material flexível."},
+{law:"Lei 1 · Campo de jogo", q:"Junto à baliza, a publicidade vertical deve estar a que distância mínima das redes?", options:["1 m","2 m","50 cm","3 m"], note:"A publicidade vertical deve situar-se, entre outras distâncias, a pelo menos 1 m das redes da baliza."},
+{law:"Lei 2 · A bola", q:"Se o travessão se deslocar mas puder ser reparado no momento, como se reinicia o jogo?", options:["Com bola ao solo","Com um livre indireto","Com um pontapé de baliza","Com um pontapé de canto"], note:"Depois de reparado ou recolocado o travessão, o jogo recomeça com uma bola ao solo."},
+{law:"Lei 2 · A bola", q:"Se a bola apresentar defeito durante o normal decorrer do jogo (fora de um reinício), como se reinicia o jogo?", options:["Com bola ao solo","Repete-se a jogada anterior","Com livre indireto à equipa que tinha a bola","Com pontapé de baliza"], note:"Uma bola defeituosa em jogo normal obriga a parar e reiniciar com bola ao solo."},
+{law:"Lei 2 · A bola", q:"Se a bola apresentar defeito precisamente no momento em que é batido um pontapé de canto, o que se faz?", options:["Repete-se o canto com outra bola","Reinicia-se com bola ao solo","Concede-se livre indireto à equipa defensora","O canto é anulado e o jogo prossegue"], note:"Se a bola tiver defeito na execução de um canto, livre, pontapé de baliza, grande penalidade, saída ou lançamento lateral, o reinício repete-se."},
+{law:"Lei 3 · Os jogadores", q:"Qual é o número máximo de suplentes que o regulamento de uma prova pode autorizar a inscrever?", options:["Entre 3 e 15","Sempre 7","Entre 5 e 12","Sem limite definido"], note:"O regulamento da competição deve estipular o número máximo de suplentes inscritos, entre 3 e 15."},
+{law:"Lei 3 · Os jogadores", q:"Nos jogos entre seleções principais adultas, quantos suplentes podem, no máximo, ser utilizados?", options:["6","5","3","12"], note:"Nesses jogos podem inscrever-se até 15 suplentes, mas só 6 podem ser utilizados."},
+{law:"Notas e modificações · «Apenas o capitão»", q:"Segundo as orientações de «apenas o capitão», qual é a distância da zona exclusiva à volta do árbitro?", options:["4 m","9,15 m","5 m","3 m"], note:"A zona exclusiva do capitão estende-se por 4 m à volta do árbitro."},
+{law:"Lei 3 · Os jogadores", q:"Um jogador de campo pode trocar de posição com o guarda-redes a qualquer momento, sem aviso?", options:["Não — o árbitro tem de ser informado antes, e a troca só numa paragem","Sim, a qualquer momento do jogo","Só ao intervalo","Só com autorização do capitão adversário"], note:"A troca com o guarda-redes exige aviso prévio ao árbitro e deve ocorrer durante uma paragem do jogo."},
+{law:"Lei 3 · Os jogadores", q:"Um jogador expulso depois de entregue a lista da equipa, mas antes do pontapé de saída, pode ser substituído?", options:["Sim, por um suplente já inscrito","Não, a equipa fica reduzida","Só pode ser substituído ao intervalo","Só se for o guarda-redes"], note:"Pode ser substituído por um suplente inscrito, sem redução do número de substituições autorizadas."},
+{law:"Lei 3 · Os jogadores", q:"E um suplente que é expulso antes ou depois do pontapé de saída?", options:["Não pode ser substituído","Pode ser substituído por outro suplente","Só se for guarda-redes","A equipa escolhe outro jogador da lista"], note:"Um suplente expulso, antes ou depois da saída, não pode ser substituído por ninguém."},
+{law:"Lei 3 · Os jogadores", q:"Um jogador perde acidentalmente uma chuteira, toca na bola antes de a repor e marca golo. O que acontece?", options:["O golo é validado","O golo é sempre anulado","Depende da revisão do VAR","É sempre concedido livre indireto"], note:"Se o jogador tocar na bola ou marcar antes de recompor o equipamento, essa ação é validada."},
+{law:"Lei 3 · Os jogadores", q:"Em que contexto é permitido o «retorno de jogadores substituídos» ao jogo?", options:["Só no futebol jovem, amador, veteranos e de pessoas com deficiência","Em todas as competições","Apenas em jogos de seleções principais","Nunca é permitido em qualquer nível"], note:"O regresso de um jogador já substituído só é permitido nesses escalões específicos, sujeito a aprovação."},
+{law:"Lei 4 · Equipamento", q:"Quando usados, os protetores de cabeça devem ser de que cor?", options:["Pretos ou da cor predominante da camisola","Qualquer cor à escolha do jogador","Sempre brancos","Da cor dos calções"], note:"Os protetores de cabeça devem ser negros ou da cor predominante da camisola de toda a equipa."},
+{law:"Lei 4 · Equipamento", q:"A camisola interior de um jogador deve ter, obrigatoriamente, que cor?", options:["A mesma cor principal da manga da camisola","Sempre branca","Uma cor diferente da equipa adversária","Livre escolha do jogador"], note:"A camisola interior deve ter a cor da manga principal, ou reproduzir exatamente o seu padrão."},
+{law:"Lei 4 · Equipamento", q:"O uso de equipamento eletrónico ou de comunicação pelos jogadores em campo é...", options:["Proibido, exceto quando permitido um SEDM","Sempre permitido livremente","Permitido só aos capitães","Permitido apenas na segunda parte"], note:"É proibido aos jogadores usar equipamento eletrónico, salvo um sistema eletrónico de desempenho e monitorização (SEDM) autorizado."},
+{law:"Lei 4 · Equipamento", q:"Se um jogador tiver uma infração de equipamento (por exemplo, falta uma caneleira), o árbitro deve...", options:["Mandá-lo sair para corrigir, sem ter obrigatoriamente de parar o jogo de imediato","Expulsá-lo de imediato","Parar sempre o jogo nesse instante","Ignorar até ao final da parte"], note:"Não é necessário paralisar o jogo de imediato; o jogador sai para corrigir o equipamento na paragem seguinte."},
+{law:"Lei 4 · Equipamento", q:"Que tipo de slogans, mensagens ou imagens NÃO são autorizados no equipamento?", options:["Políticos, religiosos ou pessoais","Publicidade autorizada pela prova","O número e o nome do jogador","O emblema da equipa"], note:"O equipamento não pode conter slogans, mensagens ou imagens de caráter político, religioso ou pessoal."},
+{law:"Lei 5 · O árbitro", q:"Desde a alteração de 2024/25, o que acontece se o guarda-redes controlar a bola com as mãos por mais de 8 segundos?", options:["É concedido pontapé de canto à equipa adversária","É concedido livre indireto à equipa adversária","O guarda-redes recebe cartão amarelo automático","O golo seguinte da equipa não conta"], note:"A infração dos 8 segundos passou a ser punida com um pontapé de canto para a equipa adversária, em vez do antigo livre indireto."},
+{law:"Lei 5 · O árbitro", q:"Qual destes NÃO é equipamento obrigatório do árbitro?", options:["Câmara pessoal","Apito","Cronómetro","Cartões amarelo e vermelho"], note:"Os árbitros e restantes membros de campo estão proibidos de usar câmaras ou outro equipamento eletrónico não autorizado."},
+{law:"Lei 5 · O árbitro", q:"Os árbitros estão autorizados a usar joias durante o jogo?", options:["Não, é proibido","Sim, sem qualquer restrição","Só brincos pequenos","Só relógios analógicos"], note:"Os árbitros estão proibidos de usar joias e bijutaria em campo."},
+{law:"Lei 5 · O árbitro", q:"Se um jogador sofrer uma lesão grave e tiver de sair do campo, por onde deve reentrar se a bola estiver em jogo?", options:["Por uma linha lateral","Por qualquer linha limítrofe","Só pela linha de meio-campo","Não pode reentrar nessa parte"], note:"Com a bola em jogo, a entrada do jogador lesionado deve ser feita por uma linha lateral."},
+{law:"Lei 5 · O árbitro", q:"Quando o árbitro concede vantagem após uma infração e a equipa não a aproveita nos segundos seguintes...", options:["A infração ainda pode ser assinalada","A infração já não pode ser punida","O jogo repete-se sempre a partir daí","É automaticamente livre indireto"], note:"Se a vantagem esperada não se concretizar de imediato ou poucos segundos depois, a infração original ainda é marcada."},
+{law:"Protocolo do VAR", q:"O VAR pode intervir para ajudar a rever qual destas quatro categorias de situações?", options:["Uma situação de golo/não golo","Uma simples falta a meio-campo sem cartão","Qualquer livre indireto concedido","Um pontapé de canto mal assinalado"], note:"O VAR só pode intervir em situações de golo/não golo, penálti/não penálti, cartão vermelho direto ou erro de identificação."},
+{law:"Protocolo do VAR", q:"Um jogador, suplente ou membro da equipa técnica que entrar na Sala de Operação de Vídeo (VOR) é...", options:["Expulso","Apenas advertido com cartão amarelo","Apenas avisado verbalmente","Não sofre qualquer sanção"], note:"Quem entrar na VOR sem autorização é expulso, seja jogador, suplente ou membro da equipa técnica."},
+{law:"Protocolo do VAR", q:"E quem entrar na Área de Revisão do Árbitro (ARA), sem ser o próprio árbitro?", options:["É advertido com cartão amarelo","É expulso","Não sofre qualquer sanção","É suspenso pela federação"], note:"A entrada na ARA por quem não seja o árbitro é sancionada com cartão amarelo."},
+{law:"Protocolo do VAR", q:"Quem pode iniciar formalmente uma revisão do VAR?", options:["Apenas o árbitro","O treinador, se pedir educadamente","O capitão da equipa","O próprio VAR, sozinho"], note:"Só o árbitro pode dar início a uma revisão; o VAR pode apenas recomendá-la."},
+{law:"Protocolo do VAR", q:"Existe um limite de tempo definido para o processo de revisão do VAR?", options:["Não — a precisão é mais importante do que a rapidez","Sim, 60 segundos","Sim, 90 segundos","Sim, 2 minutos"], note:"Não há limite de tempo para a revisão, porque a exatidão da decisão final é mais importante do que a velocidade."},
+{law:"Protocolo do VAR", q:"A decisão original do árbitro só pode ser alterada pelo VAR quando existir...", options:["Um «erro claro e manifesto»","Qualquer discordância do treinador","Um pedido insistente do capitão","Uma forte reação dos adeptos"], note:"A decisão original só é alterada em caso de «erro claro e manifesto» ou «incidente grave despercebido»."},
+{law:"Lei 8 · Início e reinício de jogo", q:"No pontapé de saída, a que distância mínima da bola devem estar os adversários?", options:["9,15 m","5 m","10 m","1 m"], note:"Os adversários da equipa que executa o pontapé de saída devem estar a, pelo menos, 9,15 m da bola."},
+{law:"Lei 8 · Início e reinício de jogo", q:"É possível marcar golo diretamente a partir do pontapé de saída?", options:["Sim, na baliza adversária","Não, nunca é permitido","Só a partir da segunda parte","Só em prolongamento"], note:"É permitido marcar golo diretamente a partir do pontapé de saída, na baliza adversária."},
+{law:"Lei 8 · Início e reinício de jogo", q:"Se, a partir do pontapé de saída, a bola entrar diretamente na própria baliza, qual é o reinício?", options:["Pontapé de canto para a equipa adversária","O golo é validado para a equipa adversária","Pontapé de baliza","Bola ao solo"], note:"Se a bola entrar na meta de quem executa o pontapé de saída, é concedido canto à equipa adversária."},
+{law:"Lei 8 · Início e reinício de jogo", q:"Numa «bola ao solo» dentro da própria área penal, a quem é concedida a bola?", options:["Ao guarda-redes da equipa defensora","Ao jogador mais próximo, seja de que equipa for","Ao capitão da equipa atacante","É sempre repetida sem disputa"], note:"Se a bola estava dentro da área penal, a bola ao solo é concedida ao guarda-redes da equipa defensora nessa área."},
+{law:"Lei 8 · Início e reinício de jogo", q:"Na execução de uma bola ao solo, a que distância mínima se devem manter os restantes jogadores?", options:["4 m","9,15 m","1 m","2 m"], note:"Os demais jogadores devem permanecer a, pelo menos, 4 m de distância até a bola estar em jogo."},
+{law:"Lei 10 · Resultado do jogo", q:"No desempate por grandes penalidades, quantos pontapés executa inicialmente cada equipa?", options:["Cinco","Três","Dez","Depende do regulamento da prova"], note:"Cada equipa executa cinco grandes penalidades, sujeitas às condições da Lei 10."},
+{law:"Lei 10 · Resultado do jogo", q:"Durante o desempate por grandes penalidades, onde devem ficar os jogadores aptos (exceto o batedor e os dois guarda-redes)?", options:["Dentro do círculo central","Na respetiva área técnica","Fora do recinto do estádio","Junto à linha de meio-campo, fora do círculo"], note:"Todos os jogadores aptos, à exceção do batedor e dos dois guarda-redes, devem permanecer dentro do círculo central."},
+{law:"Lei 10 · Resultado do jogo", q:"Se o guarda-redes cometer uma infração numa grande penalidade que obrigue a repeti-la, qual a sanção na primeira vez que isso acontece?", options:["Advertência verbal","Cartão amarelo direto","Cartão vermelho","Concessão automática de golo"], note:"Na primeira infração do género, o guarda-redes é apenas advertido verbalmente; só é amarelado em caso de reincidência."},
+{law:"Lei 11 · O impedimento", q:"Um jogador recebe a bola diretamente de um pontapé de baliza, estando à frente do penúltimo defensor. Há infração de fora de jogo?", options:["Não, não há infração nesse caso","Sim, é sempre fora de jogo","Só se tocar duas vezes na bola","Depende exclusivamente do árbitro assistente"], note:"Não há infração de fora de jogo quando o jogador recebe a bola diretamente de um pontapé de baliza, lançamento lateral ou canto."},
+{law:"Lei 11 · O impedimento", q:"Uma infração de fora de jogo é punida com...", options:["Um livre indireto no local da infração","Um livre direto","Sempre uma grande penalidade","Cartão amarelo automático ao infrator"], note:"A infração por fora de jogo é sancionada com um livre indireto no local onde ocorreu."},
+{law:"Lei 12 · Faltas e condutas incorretas", q:"«Jogo perigoso» é punido com...", options:["Livre indireto","Livre direto","Sempre grande penalidade","Cartão amarelo automático"], note:"O jogo perigoso é sancionado com um livre indireto para a equipa adversária."},
+{law:"Lei 12 · Faltas e condutas incorretas", q:"Impedir o avanço de um adversário SEM contacto físico é punido com...", options:["Livre indireto","Livre direto","Nunca é considerado falta","Cartão vermelho direto"], note:"Impedir o avanço sem contacto físico (obstrução) é sancionado com livre indireto."},
+{law:"Lei 12 · Faltas e condutas incorretas", q:"Se o guarda-redes tocar a bola com a mão dentro da própria área quando não está autorizado (por exemplo, após passe deliberado de um companheiro), qual a sanção?", options:["Livre indireto, sem sanção disciplinar","Grande penalidade sempre","Cartão amarelo automático","Livre direto"], note:"Nesse caso é concedido livre indireto à equipa adversária, sem qualquer sanção disciplinar ao guarda-redes."},
+{law:"Lei 12 · Faltas e condutas incorretas", q:"Segurar um adversário é punido com...", options:["Livre direto (ou grande penalidade, se dentro da própria área)","Livre indireto sempre","Apenas uma advertência verbal","Cartão vermelho automático"], note:"Segurar um adversário está na lista de infrações puníveis com livre direto ou grande penalidade."},
+{law:"Lei 12 · Faltas e condutas incorretas", q:"Impedir um golo claro através de uma infração deliberada com a mão (fora da própria área penal do infrator) tem como sanção...", options:["Expulsão","Apenas cartão amarelo","Apenas livre direto, sem cartão","Advertência verbal apenas"], note:"Impedir um golo ou clara oportunidade de golo com falta de mão deliberada implica expulsão, exceto para o guarda-redes na própria área."},
+{law:"Lei 12 · Faltas e condutas incorretas", q:"E se essa infração de mão for NÃO deliberada, impedir um golo claro, e for concedida grande penalidade?", options:["O infrator recebe cartão amarelo","O infrator é expulso","Não há qualquer sanção disciplinar","Concede-se livre indireto em vez de penálti"], note:"Nesse caso específico, a sanção disciplinar é apenas cartão amarelo, não expulsão."},
+{law:"Lei 12 · Faltas e condutas incorretas", q:"Quando três ou mais defensores formam barreira num livre, a que distância mínima dela se deve manter um atacante?", options:["1 m","9,15 m","2 m","50 cm"], note:"Os atacantes devem manter-se a, pelo menos, 1 m de distância de uma barreira com três ou mais defensores."},
+{law:"Lei 12 · Faltas e condutas incorretas", q:"Tirar a camisola para festejar um golo é sancionado com...", options:["Cartão amarelo, mesmo que o golo seja anulado","Nunca é sancionado","Cartão vermelho direto","Só é sancionado se repetido no mesmo jogo"], note:"Tirar a camisola para festejar é sempre punido com cartão amarelo, ainda que o golo venha a ser anulado."},
+{law:"Lei 12 · Faltas e condutas incorretas", q:"Morder ou cuspir em alguém é sempre punido com...", options:["Expulsão","Cartão amarelo","Apenas advertência verbal","Livre indireto apenas"], note:"Morder ou cuspir em qualquer pessoa é sempre uma infração passível de expulsão."},
+{law:"Lei 13 · Os livres", q:"No livre concedido à equipa defensora dentro da própria área de baliza, de onde pode ser batido?", options:["De qualquer ponto dentro dessa área","Só do exato ponto da infração","Só do centro da área de baliza","Tem de ser da marca de grande penalidade"], note:"Esses livres podem ser executados de qualquer local dentro da própria área de baliza."},
+{law:"Lei 13 · Os livres", q:"A que distância mínima devem estar os adversários quando é batido um livre?", options:["9,15 m","5 m","10 m","1 m"], note:"Antes de a bola estar em jogo, os adversários devem estar a, pelo menos, 9,15 m de distância."},
+{law:"Lei 13 · Os livres", q:"Fintar (finta corporal) para enganar o adversário ao bater um livre é...", options:["Permitido","Proibido, sanciona-se com cartão amarelo","Só permitido ao capitão da equipa","Proibido, resulta sempre em livre indireto"], note:"Realizar uma finta na execução de um livre para confundir o adversário é permitido e faz parte do jogo."},
+{law:"Lei 14 · A grande penalidade", q:"No momento do remate de uma grande penalidade, o que se exige ao guarda-redes?", options:["Ter pelo menos parte de um pé na linha de fundo ou atrás dela","Poder estar 1 m adiantado","Poder estar em qualquer sítio dentro da área","Estar obrigatoriamente no centro exato da baliza"], note:"Quando a bola é rematada, o guarda-redes deve ter pelo menos parte de um pé tocando, alinhado com, ou atrás da linha de fundo."},
+{law:"Lei 14 · A grande penalidade", q:"Se o batedor de uma grande penalidade fizer uma finta ao terminar a corrida e no momento de rematar, qual a sanção?", options:["Cartão amarelo ao batedor (as fintas na corrida são permitidas, mas não ao rematar)","Expulsão do batedor","Sem qualquer sanção, é permitido","Livre direto para a equipa defensora"], note:"A finta feita ao terminar a corrida, no ato de rematar, é sancionada com cartão amarelo ao batedor."},
+{law:"Lei 14 · A grande penalidade", q:"Se o guarda-redes e o batedor cometerem uma infração ao mesmo tempo numa grande penalidade, qual o reinício?", options:["Livre indireto para a equipa defensora e cartão amarelo ao batedor","Repete-se sempre a grande penalidade","Livre direto para a equipa atacante","O golo é sempre validado"], note:"Nesse caso, o jogo reinicia com livre indireto para a equipa defensora e o batedor é advertido com cartão amarelo."},
+{law:"Lei 15 · O lançamento lateral", q:"Num lançamento lateral, a que distância mínima se deve manter um adversário do ponto de execução?", options:["2 m","9,15 m","1 m","5 m"], note:"Um adversário que se aproxime a menos de 2 m do ponto de lançamento comete infração e é advertido."},
+{law:"Lei 15 · O lançamento lateral", q:"Se o executante de um lançamento lateral tocar de novo na bola antes de outro jogador lhe tocar (sem ser com a mão), qual o reinício?", options:["Livre indireto para a equipa adversária","Livre direto para a equipa adversária","Repete-se sempre o lançamento lateral","Concede-se grande penalidade"], note:"Tocar novamente na bola antes de outro jogador lhe tocar é punido com livre indireto para a equipa adversária."},
+];
+
+/* ---------------------------------------------------------
+   ESTADO E LÓGICA
+--------------------------------------------------------- */
+const TEST_SIZE = 20;
+
+let state = {
+  questions: [],
+  index: 0,
+  correctCount: 0,
+  wrongCount: 0,
+  answered: false,
+  history: [] // {q, chosenText, correctText, wasCorrect, law, note}
+};
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildTest(){
+  const pool = shuffle(QUESTION_BANK);
+  const picked = pool.slice(0, TEST_SIZE);
+  state.questions = picked.map(item => {
+    const optsWithFlag = item.options.map((text, i) => ({ text, isCorrect: i === 0 }));
+    return {
+      law: item.law,
+      q: item.q,
+      note: item.note,
+      options: shuffle(optsWithFlag)
+    };
+  });
+  state.index = 0;
+  state.correctCount = 0;
+  state.wrongCount = 0;
+  state.history = [];
+}
+
+const screenStart = document.getElementById('screen-start');
+const screenQuiz = document.getElementById('screen-quiz');
+const screenEnd = document.getElementById('screen-end');
+
+document.getElementById('btn-start').addEventListener('click', () => {
+  buildTest();
+  screenStart.style.display = 'none';
+  screenEnd.style.display = 'none';
+  screenQuiz.style.display = 'block';
+  renderQuestion();
+});
+
+document.getElementById('btn-restart').addEventListener('click', () => {
+  buildTest();
+  screenEnd.style.display = 'none';
+  screenQuiz.style.display = 'block';
+  renderQuestion();
+});
+
+document.getElementById('btn-next').addEventListener('click', () => {
+  state.index++;
+  if(state.index >= state.questions.length){
+    renderEnd();
+  } else {
+    renderQuestion();
+  }
+});
+
+function renderQuestion(){
+  state.answered = false;
+  const current = state.questions[state.index];
+
+  document.getElementById('q-counter').textContent = `Pergunta ${state.index + 1}/${state.questions.length}`;
+  document.getElementById('progress-fill').style.width = `${((state.index) / state.questions.length) * 100}%`;
+  document.getElementById('score-ok').textContent = state.correctCount;
+  document.getElementById('score-bad').textContent = state.wrongCount;
+  document.getElementById('law-tag').textContent = current.law;
+  document.getElementById('question-text').textContent = current.q;
+
+  const optionsWrap = document.getElementById('options');
+  optionsWrap.innerHTML = '';
+  const letters = ['A','B','C','D'];
+
+  current.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = `<span class="marker">${letters[i]}</span><span>${opt.text}</span>`;
+    btn.addEventListener('click', () => handleAnswer(opt, current, btn));
+    optionsWrap.appendChild(btn);
+  });
+
+  document.getElementById('feedback-wrap').innerHTML = '';
+  document.getElementById('next-wrap').style.display = 'none';
+}
+
+function handleAnswer(chosenOpt, current, clickedBtn){
+  if(state.answered) return;
+  state.answered = true;
+
+  const wasCorrect = chosenOpt.isCorrect;
+  if(wasCorrect){ state.correctCount++; } else { state.wrongCount++; }
+
+  const correctText = current.options.find(o => o.isCorrect).text;
+
+  state.history.push({
+    q: current.q,
+    law: current.law,
+    chosenText: chosenOpt.text,
+    correctText,
+    wasCorrect,
+    note: current.note
+  });
+
+  // marca visualmente todas as opções
+  const allBtns = document.querySelectorAll('#options .opt');
+  allBtns.forEach(btn => {
+    btn.disabled = true;
+    const label = btn.querySelector('span:last-child').textContent;
+    if(label === correctText){
+      btn.classList.add('correct');
+    } else if(btn === clickedBtn && !wasCorrect){
+      btn.classList.add('wrong');
+    } else {
+      btn.classList.add('dim');
+    }
+  });
+
+  document.getElementById('score-ok').textContent = state.correctCount;
+  document.getElementById('score-bad').textContent = state.wrongCount;
+  document.getElementById('progress-fill').style.width = `${((state.index + 1) / state.questions.length) * 100}%`;
+
+  const fbWrap = document.getElementById('feedback-wrap');
+  fbWrap.innerHTML = `
+    <div class="feedback ${wasCorrect ? 'correct' : 'wrong'}">
+      <div class="fb-title">${wasCorrect ? '✅ Certo' : '🟥 Errado'} · ${current.law}</div>
+      <p><span class="cite">"${current.note}"</span></p>
+    </div>
+  `;
+
+  const nextWrap = document.getElementById('next-wrap');
+  document.getElementById('btn-next').textContent = (state.index + 1 >= state.questions.length) ? 'Ver resultado final' : 'Seguinte pergunta';
+  nextWrap.style.display = 'block';
+}
+
+function renderEnd(){
+  screenQuiz.style.display = 'none';
+  screenEnd.style.display = 'block';
+
+  const total = state.questions.length;
+  const score = state.correctCount;
+  const pct = Math.round((score / total) * 100);
+
+  document.getElementById('end-score').textContent = score;
+  document.getElementById('end-pct').textContent = `${pct}% de acerto`;
+
+  let msg;
+  if(pct === 100) msg = 'Perfeito! Não há armadilha que te apanhe.';
+  else if(pct >= 80) msg = 'Muito sólido — conheces bem as Leis do Jogo.';
+  else if(pct >= 60) msg = 'Bom resultado, mas ainda há pormenores a afinar.';
+  else if(pct >= 40) msg = 'Há aqui matéria para rever com calma.';
+  else msg = 'Vale a pena voltar ao livro das Leis do Jogo antes do próximo apito.';
+  document.getElementById('end-msg').textContent = msg;
+
+  const reviewList = document.getElementById('review-list');
+  reviewList.innerHTML = '';
+  state.history.forEach((h, i) => {
+    const div = document.createElement('div');
+    div.className = `review-item ${h.wasCorrect ? 'ok' : 'bad'}`;
+    div.innerHTML = `
+      <span class="ri-tag">${h.wasCorrect ? 'Certo' : 'Errado'} · ${h.law}</span>
+      <div class="ri-q">${i + 1}. ${h.q}</div>
+      <div class="ri-ans">${h.wasCorrect ? `A tua resposta: ${h.chosenText}` : `A tua resposta: ${h.chosenText} · Correta: ${h.correctText}`}</div>
+    `;
+    reviewList.appendChild(div);
+  });
+}
+
+document.getElementById('review-toggle').addEventListener('click', (e) => {
+  const list = document.getElementById('review-list');
+  const isOpen = list.classList.toggle('open');
+  e.target.textContent = isOpen ? 'Ocultar revisão pergunta a pergunta ▴' : 'Ver revisão pergunta a pergunta ▾';
+});
+</script>
+</body>
+</html>
